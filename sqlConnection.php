@@ -3,82 +3,29 @@
  * Created by IntelliJ IDEA.
  * User: Nicki Jensen
  * Date: 09-12-2016
- * Time: 11:02
+ * Time: 16:07
  */
-
 
 $servername = "83.89.102.65";
 $username = "Nicki";
 $password = "Kode2139";
 $dbName = "userDB";
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbName);
+//open connection to mysql db
+$connection = mysqli_connect($servername, $username, $password, $dbName) or die("Error " . mysqli_error($connection));
 
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+//fetch table rows from mysql db
+$sql = "select * from users";
+$result = mysqli_query($connection, $sql) or die("Error in Selecting " . mysqli_error($connection));
+
+//create an array
+$emparray = array();
+while($row =mysqli_fetch_assoc($result))
+{
+    $emparray[] = $row;
 }
-echo "Connected successfully";
+echo json_encode($emparray);
 
-$sql = "SELECT * FROM users";
-$result = mysqli_query($conn, $sql);
-
-
-if (mysqli_num_rows($result) > 0) {
-
-    $row = mysqli_fetch_row($result);
-
-    // ---- Tror problemet ligger i dette while loop ----
-    while ($row = mysqli_fetch_assoc($result)) {
-
-        echo
-        // Denne kode hiver sidste row i table ud
-            "<br>
-            id: " . $row["id"] . "  
-            Name: " . $row["first_name"] . " " . $row["last_name"] . " 
-            Address: " . $row["address"] . " " . $row["zip"] . " " . $row["city"] . "
-            Phone: " . $row["phone"] .
-            "<br>";
-
-        // Denne kode kommer med fejl
-        /*
-        '{
-"code" : "200",
-"msg" : "Success",
-"data" : [
-    {
-        "id" : "' . $row[0] . '",
-        "firstName": "' . $row[1] . '",
-        "lastName" : "' . $row[2] . '"
-        "address" : "' . $row[3] . '"
-        "zip" : "' . $row[4] . '"
-        "city" : "' . $row[5] . '"
-        "email" : "' . $row[6] . '"
-        "phone" : "' . $row[7] . '"
-    }
-]
-}';
-        */
-
-    }
-} else {
-    echo '{
-    "code" : "403",
-    "msg" : "Access denied"
-    }';
-
-}
-
-/*
-            "id" : "' . $row['id'] . '",
-            "firstName": "' . $row['first_name'] . '",
-            "lastName" : "' . $row['last_name'] . '"
-            "address" : "' . $row['address'] . '"
-            "zip" : "' . $row['zip'] . '"
-            "city" : "' . $row['city'] . '"
-            "email" : "' . $row['email'] . '"
-            "phone" : "' . $row['phone'] . '"
-*/
-
-
+echo json_last_error_msg();
+//close the db connection
+mysqli_close($connection);
